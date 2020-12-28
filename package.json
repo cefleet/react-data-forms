@@ -1,12 +1,12 @@
 {
     "name": "react-data-forms",
-    "author":"Clint Fleetwood",
+    "author": "Clint Fleetwood",
     "repository": {
-		"type": "git",
-		"url": "https://github.com/cefleet/react-data-forms.git"
+        "type": "git",
+        "url": "https://github.com/cefleet/react-data-forms.git"
     },
     "license": "MIT",
-    "version": "0.1.8",
+    "version": "0.1.9",
     "private": false,
     "main": "./dist/react-data-forms.js",
     "babel": {
@@ -20,7 +20,7 @@
         "react-scripts": "4.0.1"
     },
     "scripts": {
-        "publish:npm": "rm -rf dist && mkdir dist &&  babel ./src/ -d dist --copy-files"
+        "publish:npm": "mv node_modules_hidden node_modules && rm -rf dist && mkdir dist &&  babel ./src/ -d dist --copy-files && mv node_modules node_modules_hidden"
     },
     "devDependencies": {
         "@babel/cli": "^7.5.5",
