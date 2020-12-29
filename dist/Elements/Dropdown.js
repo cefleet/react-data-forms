@@ -9,14 +9,16 @@ const Input = ({
   options = {}
 }) => {
   return /*#__PURE__*/React.createElement("div", {
-    className: "form-element"
+    className: "form-element-dropdown"
   }, /*#__PURE__*/React.createElement("label", {
     htmlFor: name
   }, uppercase(title)), /*#__PURE__*/React.createElement("select", {
     name: name,
     onChange: onChange,
     value: value
-  }, Object.entries(options).map(([key, value]) => /*#__PURE__*/React.createElement("option", {
+  }, /*#__PURE__*/React.createElement("option", {
+    value: ""
+  }, "-- Please Select From List --"), Object.entries(options).map(([key, value]) => /*#__PURE__*/React.createElement("option", {
     key: key,
     value: key
   }, value))));

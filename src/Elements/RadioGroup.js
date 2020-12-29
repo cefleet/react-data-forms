@@ -3,7 +3,7 @@ import uppercase from "../helpers/uppercase";
 
 const RadioGroup = ({name,title,value = "", onChange,options={}}) => {
     return(
-        <div className="form-element radio">
+        <div className="form-element-radio">
             <label>{uppercase(title)}</label>
             <div className="radio-options">
                 {Object.entries(options).map(([key,v],idx)=>(

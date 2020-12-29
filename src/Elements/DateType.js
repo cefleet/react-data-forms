@@ -14,7 +14,7 @@ const DateType = ({name,title,value, onChange, options={}}) => {
     };
 
    return(
-        <div className="form-element date">
+        <div className="form-element-date">
             <label htmlFor={name}>{uppercase(title)}</label>
             <input 
                 name={name} 

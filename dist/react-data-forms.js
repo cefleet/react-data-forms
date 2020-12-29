@@ -11,7 +11,8 @@ const DataForm = ({
   onChange,
   form,
   onSubmit = null,
-  submitText = ""
+  submitText = "",
+  children
 }) => {
   //This makes a single array of all of the items in the form.
   const justFields = fieldsData.flatMap(fs => fs.fields.map(f => f));
@@ -60,6 +61,7 @@ const DataForm = ({
     const E = elementTypes[d.type] || elementTypes.Input;
     const error = validationErrors.find(e => e.name === d.name);
     return /*#__PURE__*/React.createElement("div", {
+      className: "form-element",
       key: d.name
     }, /*#__PURE__*/React.createElement(E, _extends({}, d, {
       onChange: onChange,
@@ -86,7 +88,7 @@ const DataForm = ({
 
   return /*#__PURE__*/React.createElement("div", {
     className: "data-form"
-  }, validationErrors && validationErrors.length > 0 && showErrors(), fieldsData.map((f, idx, arr) => createFieldSet(f, idx, arr.length)), onSubmit && /*#__PURE__*/React.createElement("button", {
+  }, validationErrors && validationErrors.length > 0 && showErrors(), fieldsData.map((f, idx, arr) => createFieldSet(f, idx, arr.length)), children, onSubmit && /*#__PURE__*/React.createElement("button", {
     onClick: formSubmitted,
     className: "data-form-submit"
   }, submitText));

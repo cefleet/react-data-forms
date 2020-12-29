@@ -9,7 +9,7 @@ const RadioGroup = ({
   options = {}
 }) => {
   return /*#__PURE__*/React.createElement("div", {
-    className: "form-element radio"
+    className: "form-element-radio"
   }, /*#__PURE__*/React.createElement("label", null, uppercase(title)), /*#__PURE__*/React.createElement("div", {
     className: "radio-options"
   }, Object.entries(options).map(([key, v], idx) => /*#__PURE__*/React.createElement("div", {

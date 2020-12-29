@@ -31,7 +31,7 @@ const DateType = ({
   };
 
   return /*#__PURE__*/React.createElement("div", {
-    className: "form-element date"
+    className: "form-element-date"
   }, /*#__PURE__*/React.createElement("label", {
     htmlFor: name
   }, uppercase(title)), /*#__PURE__*/React.createElement("input", _extends({

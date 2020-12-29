@@ -9,15 +9,16 @@ const Input = ({
   value = "",
   onChange,
   type = "text",
-  options = {}
+  options = {},
+  placeholder = ""
 }) => {
   return /*#__PURE__*/React.createElement("div", {
-    className: "form-element input"
+    className: "form-element-input"
   }, /*#__PURE__*/React.createElement("label", {
     htmlFor: name
   }, uppercase(title)), /*#__PURE__*/React.createElement("input", _extends({
     name: name,
-    placeholder: title,
+    placeholder: placeholder,
     onChange: onChange,
     value: value,
     type: type

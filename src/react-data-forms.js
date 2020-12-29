@@ -3,7 +3,7 @@ import Input from "./Elements/Input";
 import RadioGroup from "./Elements/RadioGroup";
 import Dropdown from "./Elements/Dropdown";
 import DateType from "./Elements/DateType";
-const DataForm = ({fieldsData, onChange, form, onSubmit=null, submitText=""}) => {
+const DataForm = ({fieldsData, onChange, form, onSubmit=null, submitText="", children}) => {
     
     //This makes a single array of all of the items in the form.
     const justFields = fieldsData.flatMap(fs=>fs.fields.map(f=>f));
@@ -53,7 +53,7 @@ const DataForm = ({fieldsData, onChange, form, onSubmit=null, submitText=""}) =>
                         const E = elementTypes[d.type] || elementTypes.Input;
                         const error = validationErrors.find(e=>e.name === d.name )
                         return (
-                        <div key={d.name} >                            
+                        <div className='form-element' key={d.name} >                            
                             <E {...d} onChange={onChange} value={form[d.name]} />
                             {error && <div className="data-form-error"> ^ {d.title} : {error.error}</div>}
                         </div>
@@ -84,6 +84,7 @@ const DataForm = ({fieldsData, onChange, form, onSubmit=null, submitText=""}) =>
     <div className='data-form' >
         {(validationErrors && validationErrors.length > 0) && showErrors()}
         {fieldsData.map((f,idx, arr)=>createFieldSet(f,idx, arr.length))}
+        {children}
         {onSubmit && <button onClick={formSubmitted} className='data-form-submit'>{submitText}</button>}
     </div>)
 };
