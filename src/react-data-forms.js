@@ -1,12 +1,29 @@
 import React, {useState} from "react";
-import Input from "./Elements/Input";
-import RadioGroup from "./Elements/RadioGroup";
-import Dropdown from "./Elements/Dropdown";
-import DateType from "./Elements/DateType";
-const DataForm = ({fieldsData, onChange, form, onSubmit=null, submitText="", children}) => {
+import _Input from "./Elements/Input";
+import _RadioGroup from "./Elements/RadioGroup";
+import _Dropdown from "./Elements/Dropdown";
+import _DateType from "./Elements/DateType";
+const DataForm = ({onChange, _updateForm, fieldsData, _form, onSubmit, submitText, children}) => {
     
+    const updateForm = ({target:{value,name}}) => {
+        _updateForm(name,value);
+        if(typeof onChange !== 'function') return;
+        onChange(name,value);
+    }
+
     //This makes a single array of all of the items in the form.
     const justFields = fieldsData.flatMap(fs=>fs.fields.map(f=>f));
+
+    //This i crazy looking but it looks for the fields to see if there are any default options.
+    //if there are it maps them with the default value ..or the current value in the form
+    //then it combines that with the form values
+    const defaults = justFields
+        .filter(fd=>(fd.hasOwnProperty('options') && fd.options.hasOwnProperty('default')) )
+        .map(fd=>([fd.name,(_form[fd.name] || fd.options.default)]))
+        .reduce((a,[key,value])=>({...a,[key]:value}),{});    
+
+    //apply defaults
+    const form = {...defaults,..._form};
 
     const [validationErrors, setValidationErrors] = useState([]);
 
@@ -20,7 +37,7 @@ const DataForm = ({fieldsData, onChange, form, onSubmit=null, submitText="", chi
 
     //handle validation here
     const formSubmitted = async () =>{ 
-        //validate first!
+        //validate first!    
 
         //these are the ones that need to be validated
         let validateList = justFields.filter(f=>f.validate);
@@ -39,8 +56,20 @@ const DataForm = ({fieldsData, onChange, form, onSubmit=null, submitText="", chi
         if(errors.length > 0) return setValidationErrors(errors);
     };
 
-    //TODO 
-    const createFieldSet = (data,idx, length)=>(
+    //Making createElement and CreateFieldset react components with props causes them to re-render and just messes up the world.
+    //This just works so don't change it unless you want a headache.
+    const createElement = (d) =>{
+        const E = elementTypes[d.type] || elementTypes.Input; //defaults to input if there is not a type
+        const error = validationErrors.find(e=>e.name === d.name )
+        return (
+            <div className='form-element' key={d.name} >                            
+                <E {...d} onChange={updateForm} value={form[d.name] || defaults[d.name]} />
+                {error && <div className="data-form-error"> {error.error}</div>}
+            </div>
+        )
+    }
+
+    const createFieldSet = (data,idx,length)=>(
         <fieldset key={idx} className={idx === onFieldset ? 'open':'closed'}>
             <legend>
                 {onFieldset !== idx && <button onClick={()=>setOnFieldset(idx)}>{data.title}</button>}
@@ -49,16 +78,7 @@ const DataForm = ({fieldsData, onChange, form, onSubmit=null, submitText="", chi
             <details open = {idx === onFieldset ? true:false }>
                 <summary style={{display:'none'}}></summary>
                 <div className='form-element-group'>        
-                    {data.fields.map(d=>{
-                        const E = elementTypes[d.type] || elementTypes.Input;
-                        const error = validationErrors.find(e=>e.name === d.name )
-                        return (
-                        <div className='form-element' key={d.name} >                            
-                            <E {...d} onChange={onChange} value={form[d.name]} />
-                            {error && <div className="data-form-error"> ^ {d.title} : {error.error}</div>}
-                        </div>
-                        )
-                    })}
+                    {data.fields.map(d=>createElement(d))}
                 </div> 
                 <div className='form-navigation'>
                     {idx !== 0 && <button onClick={()=>setOnFieldset(idx-1)}>Prev</button>}
@@ -70,7 +90,7 @@ const DataForm = ({fieldsData, onChange, form, onSubmit=null, submitText="", chi
 
     //if the error name is found, the error message will show up near that form item.
     //otherwise it will be a general for error.
-    const showErrors = () => (
+    const ShowErrors = () => (
         <div>
             <div className='data-form-error'>There are Errors.</div>
         {
@@ -78,21 +98,35 @@ const DataForm = ({fieldsData, onChange, form, onSubmit=null, submitText="", chi
             .filter(e=>!justFields.find(f=>e.name===f.name))
             .map((e,idx)=><div key={idx} className='data-form-error'>{e.name}: {e.error}</div>)
         }
-    </div>)
+        </div>
+    );
 
     return (
     <div className='data-form' >
-        {(validationErrors && validationErrors.length > 0) && showErrors()}
-        {fieldsData.map((f,idx, arr)=>createFieldSet(f,idx, arr.length))}
+        {(validationErrors && validationErrors.length > 0) && <ShowErrors />}
+        {fieldsData.map((f,idx, arr)=>createFieldSet(f,idx,arr.length))}
         {children}
         {onSubmit && <button onClick={formSubmitted} className='data-form-submit'>{submitText}</button>}
     </div>)
 };
 
 
-export const useDataForm = (formData) => {
-    const [form, setForm] = useState(formData || {});
-    const updateForm = ({target:{value,name}}) => setForm({...form, [name]:value});
+export const useDataForm = (formData, fieldsData) => {
     
-    return {form, updateForm, DataForm};
+    const DataFormHOC = ({onChange=null, onSubmit=null, submitText="", children})=>{
+        const [_form, setForm] = useState(formData || {});
+
+        
+        const _updateForm = (name,value) => setForm({..._form, [name]:value});
+
+        return <DataForm {...{onChange,fieldsData,onSubmit, submitText, _updateForm, _form, children}} />
+
+    }
+
+    return {DataForm:DataFormHOC}
 };
+
+export const Input = _Input;
+export const RadioGroup = _RadioGroup; 
+export const Dropdown = _Dropdown;
+export const DateType = _DateType;

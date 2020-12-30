@@ -16,14 +16,14 @@ const RadioGroup = ({
     key: key,
     className: "radio-option"
   }, /*#__PURE__*/React.createElement("input", {
-    id: key + idx,
+    id: name + key + idx,
     checked: value === key,
     name: name,
     value: key,
     type: "radio",
     onChange: onChange
   }), /*#__PURE__*/React.createElement("label", {
-    htmlFor: key + idx
+    htmlFor: name + key + idx
   }, uppercase(v))))));
 };
 

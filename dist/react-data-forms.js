@@ -1,21 +1,44 @@
 function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 
 import React, { useState } from "react";
-import Input from "./Elements/Input";
-import RadioGroup from "./Elements/RadioGroup";
-import Dropdown from "./Elements/Dropdown";
-import DateType from "./Elements/DateType";
+import _Input from "./Elements/Input";
+import _RadioGroup from "./Elements/RadioGroup";
+import _Dropdown from "./Elements/Dropdown";
+import _DateType from "./Elements/DateType";
 
 const DataForm = ({
-  fieldsData,
   onChange,
-  form,
-  onSubmit = null,
-  submitText = "",
+  _updateForm,
+  fieldsData,
+  _form,
+  onSubmit,
+  submitText,
   children
 }) => {
-  //This makes a single array of all of the items in the form.
-  const justFields = fieldsData.flatMap(fs => fs.fields.map(f => f));
+  const updateForm = ({
+    target: {
+      value,
+      name
+    }
+  }) => {
+    _updateForm(name, value);
+
+    if (typeof onChange !== 'function') return;
+    onChange(name, value);
+  }; //This makes a single array of all of the items in the form.
+
+
+  const justFields = fieldsData.flatMap(fs => fs.fields.map(f => f)); //This i crazy looking but it looks for the fields to see if there are any default options.
+  //if there are it maps them with the default value ..or the current value in the form
+  //then it combines that with the form values
+
+  const defaults = justFields.filter(fd => fd.hasOwnProperty('options') && fd.options.hasOwnProperty('default')).map(fd => [fd.name, _form[fd.name] || fd.options.default]).reduce((a, [key, value]) => ({ ...a,
+    [key]: value
+  }), {}); //apply defaults
+
+  const form = { ...defaults,
+    ..._form
+  };
   const [validationErrors, setValidationErrors] = useState([]);
   const [onFieldset, setOnFieldset] = useState(0);
   const elementTypes = {
@@ -26,7 +49,7 @@ const DataForm = ({
   }; //handle validation here
 
   const formSubmitted = async () => {
-    //validate first!
+    //validate first!    
     //these are the ones that need to be validated
     let validateList = justFields.filter(f => f.validate); //for now just dealing with notNull
 
@@ -41,8 +64,24 @@ const DataForm = ({
     errors = await onSubmit(form);
     if (!errors) return;
     if (errors.length > 0) return setValidationErrors(errors);
-  }; //TODO 
+  }; //Making createElement and CreateFieldset react components with props causes them to re-render and just messes up the world.
+  //This just works so don't change it unless you want a headache.
 
+
+  const createElement = d => {
+    const E = elementTypes[d.type] || elementTypes.Input; //defaults to input if there is not a type
+
+    const error = validationErrors.find(e => e.name === d.name);
+    return /*#__PURE__*/React.createElement("div", {
+      className: "form-element",
+      key: d.name
+    }, /*#__PURE__*/React.createElement(E, _extends({}, d, {
+      onChange: updateForm,
+      value: form[d.name] || defaults[d.name]
+    })), error && /*#__PURE__*/React.createElement("div", {
+      className: "data-form-error"
+    }, " ", error.error));
+  };
 
   const createFieldSet = (data, idx, length) => /*#__PURE__*/React.createElement("fieldset", {
     key: idx,
@@ -57,19 +96,7 @@ const DataForm = ({
     }
   }), /*#__PURE__*/React.createElement("div", {
     className: "form-element-group"
-  }, data.fields.map(d => {
-    const E = elementTypes[d.type] || elementTypes.Input;
-    const error = validationErrors.find(e => e.name === d.name);
-    return /*#__PURE__*/React.createElement("div", {
-      className: "form-element",
-      key: d.name
-    }, /*#__PURE__*/React.createElement(E, _extends({}, d, {
-      onChange: onChange,
-      value: form[d.name]
-    })), error && /*#__PURE__*/React.createElement("div", {
-      className: "data-form-error"
-    }, " ^ ", d.title, " : ", error.error));
-  })), /*#__PURE__*/React.createElement("div", {
+  }, data.fields.map(d => createElement(d))), /*#__PURE__*/React.createElement("div", {
     className: "form-navigation"
   }, idx !== 0 && /*#__PURE__*/React.createElement("button", {
     onClick: () => setOnFieldset(idx - 1)
@@ -79,7 +106,7 @@ const DataForm = ({
   //otherwise it will be a general for error.
 
 
-  const showErrors = () => /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+  const ShowErrors = () => /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
     className: "data-form-error"
   }, "There are Errors."), validationErrors.filter(e => !justFields.find(f => e.name === f.name)).map((e, idx) => /*#__PURE__*/React.createElement("div", {
     key: idx,
@@ -88,27 +115,41 @@ const DataForm = ({
 
   return /*#__PURE__*/React.createElement("div", {
     className: "data-form"
-  }, validationErrors && validationErrors.length > 0 && showErrors(), fieldsData.map((f, idx, arr) => createFieldSet(f, idx, arr.length)), children, onSubmit && /*#__PURE__*/React.createElement("button", {
+  }, validationErrors && validationErrors.length > 0 && /*#__PURE__*/React.createElement(ShowErrors, null), fieldsData.map((f, idx, arr) => createFieldSet(f, idx, arr.length)), children, onSubmit && /*#__PURE__*/React.createElement("button", {
     onClick: formSubmitted,
     className: "data-form-submit"
   }, submitText));
 };
 
-export const useDataForm = formData => {
-  const [form, setForm] = useState(formData || {});
+export const useDataForm = (formData, fieldsData) => {
+  const DataFormHOC = ({
+    onChange = null,
+    onSubmit = null,
+    submitText = "",
+    children
+  }) => {
+    const [_form, setForm] = useState(formData || {});
 
-  const updateForm = ({
-    target: {
-      value,
-      name
-    }
-  }) => setForm({ ...form,
-    [name]: value
-  });
+    const _updateForm = (name, value) => setForm({ ..._form,
+      [name]: value
+    });
+
+    return /*#__PURE__*/React.createElement(DataForm, {
+      onChange,
+      fieldsData,
+      onSubmit,
+      submitText,
+      _updateForm,
+      _form,
+      children
+    });
+  };
 
   return {
-    form,
-    updateForm,
-    DataForm
+    DataForm: DataFormHOC
   };
 };
+export const Input = _Input;
+export const RadioGroup = _RadioGroup;
+export const Dropdown = _Dropdown;
+export const DateType = _DateType;
