@@ -122,6 +122,12 @@ const DataForm = ({
 };
 
 export const useDataForm = (formData, fieldsData) => {
+  //Such an anitpattern =\ but if I used state it would always refresh the form. 
+  //This way the developer can access the current values of the form and adjust as needed.
+  let current = {};
+
+  const getCurrentValues = () => current;
+
   const DataFormHOC = ({
     onChange = null,
     onSubmit = null,
@@ -130,9 +136,14 @@ export const useDataForm = (formData, fieldsData) => {
   }) => {
     const [_form, setForm] = useState(formData || {});
 
-    const _updateForm = (name, value) => setForm({ ..._form,
-      [name]: value
-    });
+    const _updateForm = (name, value) => {
+      let newValues = { ..._form,
+        [name]: value
+      };
+      setForm(newValues);
+      current = { ...newValues
+      };
+    };
 
     return /*#__PURE__*/React.createElement(DataForm, {
       onChange,
@@ -146,7 +157,8 @@ export const useDataForm = (formData, fieldsData) => {
   };
 
   return {
-    DataForm: DataFormHOC
+    DataForm: DataFormHOC,
+    getCurrentValues
   };
 };
 export const Input = _Input;

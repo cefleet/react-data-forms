@@ -3,7 +3,7 @@ import _Input from "./Elements/Input";
 import _RadioGroup from "./Elements/RadioGroup";
 import _Dropdown from "./Elements/Dropdown";
 import _DateType from "./Elements/DateType";
-const DataForm = ({onChange, _updateForm, fieldsData, _form, onSubmit, submitText, children}) => {
+const DataForm = ({onChange, _updateForm, fieldsData, _form, onSubmit, submitText, children}) => { 
     
     const updateForm = ({target:{value,name}}) => {
         _updateForm(name,value);
@@ -113,17 +113,24 @@ const DataForm = ({onChange, _updateForm, fieldsData, _form, onSubmit, submitTex
 
 export const useDataForm = (formData, fieldsData) => {
     
-    const DataFormHOC = ({onChange=null, onSubmit=null, submitText="", children})=>{
+    //Such an anitpattern =\ but if I used state it would always refresh the form. 
+    //This way the developer can access the current values of the form and adjust as needed.
+    let current = {};
+    const getCurrentValues=()=>current;
+
+    const DataFormHOC = ({onChange=null, onSubmit=null, submitText="", children})=> {
         const [_form, setForm] = useState(formData || {});
 
-        
-        const _updateForm = (name,value) => setForm({..._form, [name]:value});
+        const _updateForm = (name,value) => {
+            let newValues = {..._form, [name]:value};
+            setForm(newValues);
+            current = {...newValues};
+        };
 
         return <DataForm {...{onChange,fieldsData,onSubmit, submitText, _updateForm, _form, children}} />
-
     }
 
-    return {DataForm:DataFormHOC}
+    return {DataForm:DataFormHOC, getCurrentValues}
 };
 
 export const Input = _Input;
