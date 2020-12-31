@@ -5,6 +5,7 @@ import _Input from "./Elements/Input";
 import _RadioGroup from "./Elements/RadioGroup";
 import _Dropdown from "./Elements/Dropdown";
 import _DateType from "./Elements/DateType";
+import _Range from "./Elements/Range";
 
 const DataForm = ({
   onChange,
@@ -45,7 +46,8 @@ const DataForm = ({
     Input: Input,
     RadioGroup: RadioGroup,
     Dropdown: Dropdown,
-    DateType: DateType
+    DateType: DateType,
+    Range: Range
   }; //handle validation here
 
   const formSubmitted = async () => {
@@ -165,3 +167,4 @@ export const Input = _Input;
 export const RadioGroup = _RadioGroup;
 export const Dropdown = _Dropdown;
 export const DateType = _DateType;
+export const Range = _Range;

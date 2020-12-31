@@ -3,6 +3,8 @@ import _Input from "./Elements/Input";
 import _RadioGroup from "./Elements/RadioGroup";
 import _Dropdown from "./Elements/Dropdown";
 import _DateType from "./Elements/DateType";
+import _Range from "./Elements/Range";
+
 const DataForm = ({onChange, _updateForm, fieldsData, _form, onSubmit, submitText, children}) => { 
     
     const updateForm = ({target:{value,name}}) => {
@@ -32,7 +34,8 @@ const DataForm = ({onChange, _updateForm, fieldsData, _form, onSubmit, submitTex
         Input:Input,
         RadioGroup:RadioGroup,
         Dropdown:Dropdown,
-        DateType:DateType
+        DateType:DateType,
+        Range:Range
     }
 
     //handle validation here
@@ -137,3 +140,4 @@ export const Input = _Input;
 export const RadioGroup = _RadioGroup; 
 export const Dropdown = _Dropdown;
 export const DateType = _DateType;
+export const Range = _Range;
