@@ -6,6 +6,7 @@ import _RadioGroup from "./Elements/RadioGroup";
 import _Dropdown from "./Elements/Dropdown";
 import _DateType from "./Elements/DateType";
 import _Range from "./Elements/Range";
+import _Textarea from "./Elements/Textarea";
 
 const DataForm = ({
   onChange,
@@ -47,7 +48,8 @@ const DataForm = ({
     RadioGroup: RadioGroup,
     Dropdown: Dropdown,
     DateType: DateType,
-    Range: Range
+    Range: Range,
+    Textarea: Textarea
   }; //handle validation here
 
   const formSubmitted = async () => {
@@ -123,7 +125,7 @@ const DataForm = ({
   }, submitText));
 };
 
-export const useDataForm = (formData, fieldsData) => {
+export const useDataForm = (fieldsData, formData) => {
   //Such an anitpattern =\ but if I used state it would always refresh the form. 
   //This way the developer can access the current values of the form and adjust as needed.
   let current = {};
@@ -168,3 +170,4 @@ export const RadioGroup = _RadioGroup;
 export const Dropdown = _Dropdown;
 export const DateType = _DateType;
 export const Range = _Range;
+export const Textarea = _Textarea;
